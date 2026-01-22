@@ -3,10 +3,14 @@
 
 #include "EventScheduler.h"
 #include "Display.h"
+#include "GameState.h"
+#include "GameState.h"
 
 class Game {
 
   public:
+    GameState state;
+
     Game(EventScheduler* scheduler, Display* disp) {
       eventScheduler = scheduler;
       displayPtr = disp;
@@ -16,32 +20,45 @@ class Game {
     void setup() {
       eventScheduler->addEvent(updateGameState, 2000);  // Update every 2 seconds
       eventScheduler->addEvent(updateDisplay, 500);     // Refresh display every 0.5 seconds
+
+      // Initialize with idle state on bottom partition
+      displayPtr->getBottomPartition()->write(displayPtr->getDisplay(), "A");
+      displayPtr->paint();
     }
 
     void loop() {
       eventScheduler->update();
     }
 
-
-    void feed() {
-      hunger = min(100, hunger + 20);
+    void doFeed() {
+      displayPtr->getBottomPartition()->write(displayPtr->getDisplay(), "B");
+      displayPtr->paint();
+      state.feed();
+      delay(1000);
+      displayPtr->getBottomPartition()->write(displayPtr->getDisplay(), "A");
+      displayPtr->paint();
     }
 
     void doPlay() {
-      play = min(100, play + 15);
+      displayPtr->getBottomPartition()->write(displayPtr->getDisplay(), "C");
+      displayPtr->paint();
+      state.doPlay();
+      delay(1000);
+      displayPtr->getBottomPartition()->write(displayPtr->getDisplay(), "A");
+      displayPtr->paint();
     }
 
     void doRave() {
-      rave = min(100, rave + 25);
+      displayPtr->getBottomPartition()->write(displayPtr->getDisplay(), "D");
+      displayPtr->paint();
+      state.doRave();
+      delay(1000);
+      displayPtr->getBottomPartition()->write(displayPtr->getDisplay(), "A");
+      displayPtr->paint();
     }
 
+
   private:
-    int hunger = 100;
-    int play = 100;
-    int rave = 100;
-
-    int ticks = 0;
-
     EventScheduler* eventScheduler;
     Display* displayPtr;
 
@@ -49,26 +66,22 @@ class Game {
 
 
     static void updateGameState() {
-      // Decrease stats over time
-      if (gameInstance->hunger > 0) {
-        gameInstance->hunger -= 5;
-      }
-      if (gameInstance->play > 0) {
-        gameInstance->play -= 3;
-      }
-      if (gameInstance->rave > 0) {
-        gameInstance->rave -= 2;
-      }
-
-      gameInstance->ticks++;
+      gameInstance->state.decay();
     }
 
     static void updateDisplay() {
-      gameInstance->displayPtr->printGameState(
-        gameInstance->hunger,
-        gameInstance->play,
-        gameInstance->rave
+      // Update top partition with stats
+      char statsBuffer[50];
+      sprintf(statsBuffer, "H:%d P:%d R:%d",
+        gameInstance->state.getHunger(),
+        gameInstance->state.getPlay(),
+        gameInstance->state.getRave()
       );
+      gameInstance->displayPtr->getTopPartition()->write(
+        gameInstance->displayPtr->getDisplay(),
+        statsBuffer
+      );
+      gameInstance->displayPtr->paint();
     }
 
 };

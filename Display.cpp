@@ -35,22 +35,10 @@ Adafruit_PCD8544* Display::getDisplay() {
   return display;
 }
 
-void Display::printGameState(int hunger, int play, int rave) {
-  display->clearDisplay();
-  display->setTextSize(1);
-  display->setTextColor(BLACK);
 
-  display->setCursor(0, 0);
-  display->print("Hunger: ");
-  display->println(hunger);
-
-  display->setCursor(0, 10);
-  display->print("Play: ");
-  display->println(play);
-
-  display->setCursor(0, 20);
-  display->print("Rave: ");
-  display->println(rave);
-
+void Display::paint() {
+  // the paint function just calls display() to render everything to screen
+  //
+  // partitions handle their own drawing using write()
   display->display();
 }
