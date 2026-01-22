@@ -43,7 +43,15 @@ class Partition {
       display->println(text);
     }
 
-    void drawBitmap(Adafruit_PCD8544* display, const unsigned char* bitmap, int bitmapWidth, int bitmapHeight, int offsetX = -1, int offsetY = -1, bool flip = false) {
+    void drawBitmap(
+      Adafruit_PCD8544* display, 
+      const unsigned char* bitmap, 
+      int bitmapWidth, 
+      int bitmapHeight, 
+      int offsetX = -1, 
+      int offsetY = -1, 
+      bool flip = false
+    ) {
       // Clear this partition first
       clear(display);
 
@@ -66,32 +74,39 @@ class Partition {
       }
     }
 
-    int getX() const { return x; }
-    int getY() const { return y; }
-    int getWidth() const { return width; }
-    int getHeight() const { return height; }
-
   private:
     int x, y, width, height;
 
-    void drawFlippedBitmap(Adafruit_PCD8544* display, const unsigned char* bitmap, int bitmapX, int bitmapY, int w, int h) {
-      // Draw bitmap flipped horizontally
-      for (int j = 0; j < h; j++) {
-        for (int i = 0; i < w; i++) {
-          // Calculate byte and bit position in the original bitmap
-          int byteIndex = (j * w + i) / 8;
-          int bitIndex = 7 - ((j * w + i) % 8);
+    void drawFlippedBitmap(
+      Adafruit_PCD8544* display,
+      const uint8_t* bitmap,
+      int x0,
+      int y0,
+      int w,
+      int h
+    ) {
+      int bytesPerRow = (w + 7) / 8;
 
-          // Read the pixel from the bitmap
-          bool pixel = (bitmap[byteIndex] >> bitIndex) & 1;
+      for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
 
-          // Draw the pixel flipped horizontally
+          int byteIndex = y * bytesPerRow + (x / 8);
+          int bitIndex  = 7 - (x % 8);
+
+          uint8_t b = pgm_read_byte(&bitmap[byteIndex]);
+          bool pixel = (b >> bitIndex) & 1;
+
           if (pixel) {
-            display->drawPixel(bitmapX + (w - 1 - i), bitmapY + j, BLACK);
+            display->drawPixel(
+                x0 + (w - 1 - x),  // horizontal flip
+                y0 + y,
+                BLACK
+            );
           }
         }
       }
     }
+
 };
 
 
