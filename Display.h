@@ -26,74 +26,25 @@
 // overwriting other UI
 class Partition {
   public:
-    Partition(int x, int y, int width, int height)
-      : x(x), y(y), width(width), height(height) {}
+    Partition(int x, int y, int width, int height);
 
-    void clear(Adafruit_PCD8544* display) {
-      display->fillRect(x, y, width, height, WHITE);
-    }
-
-    void write(Adafruit_PCD8544* display, const char* text) {
-      // Clear this partition first
-      clear(display);
-
-      // Write text to this partition
-      display->setTextSize(1);
-      display->setTextColor(BLACK);
-      display->setCursor(x, y);
-      display->println(text);
-    }
-
-    void writeCentered(Adafruit_PCD8544* display, const char* text, int textSize = 1) {
-      // Clear this partition first
-      clear(display);
-
-      // Calculate text width (rough estimate: 6 pixels per char for size 1)
-      int textWidth = strlen(text) * 6 * textSize;
-      int textX = x + (width - textWidth) / 2;
-
-      // Write centered text to this partition
-      display->setTextSize(textSize);
-      display->setTextColor(BLACK);
-      display->setCursor(textX, y);
-      display->print(text);
-    }
-
+    void clear(Adafruit_PCD8544* display);
+    void write(Adafruit_PCD8544* display, const char* text);
+    void writeCentered(Adafruit_PCD8544* display, const char* text, int textSize = 1);
     void drawBitmap(
-      Adafruit_PCD8544* display, 
-      const unsigned char* bitmap, 
-      int bitmapWidth, 
-      int bitmapHeight, 
-      int offsetX = -1, 
-      int offsetY = -1, 
+      Adafruit_PCD8544* display,
+      const unsigned char* bitmap,
+      int bitmapWidth,
+      int bitmapHeight,
+      int offsetX = -1,
+      int offsetY = -1,
       bool flip = false
-    ) {
-      // Clear this partition first
-      clear(display);
+    );
 
-      int bitmapX, bitmapY;
-
-      // If offsets are provided (not -1), use them; otherwise center the bitmap
-      if (offsetX == -1 || offsetY == -1) {
-        bitmapX = x + (width - bitmapWidth) / 2;
-        bitmapY = y + (height - bitmapHeight) / 2;
-      } else {
-        bitmapX = x + offsetX;
-        bitmapY = y + offsetY;
-      }
-
-      if (flip) {
-        // Draw flipped bitmap pixel by pixel
-        drawFlippedBitmap(display, bitmap, bitmapX, bitmapY, bitmapWidth, bitmapHeight);
-      } else {
-        display->drawBitmap(bitmapX, bitmapY, bitmap, bitmapWidth, bitmapHeight, BLACK);
-      }
-    }
-
-    int getX() const { return x; }
-    int getY() const { return y; }
-    int getWidth() const { return width; }
-    int getHeight() const { return height; }
+    int getX() const;
+    int getY() const;
+    int getWidth() const;
+    int getHeight() const;
 
   private:
     int x, y, width, height;
@@ -105,29 +56,7 @@ class Partition {
       int y0,
       int w,
       int h
-    ) {
-      int bytesPerRow = (w + 7) / 8;
-
-      for (int y = 0; y < h; y++) {
-        for (int x = 0; x < w; x++) {
-
-          int byteIndex = y * bytesPerRow + (x / 8);
-          int bitIndex  = 7 - (x % 8);
-
-          uint8_t b = pgm_read_byte(&bitmap[byteIndex]);
-          bool pixel = (b >> bitIndex) & 1;
-
-          if (pixel) {
-            display->drawPixel(
-                x0 + (w - 1 - x),  // horizontal flip
-                y0 + y,
-                BLACK
-            );
-          }
-        }
-      }
-    }
-
+    );
 };
 
 

@@ -1,6 +1,8 @@
 #ifndef SPRITES_H
 #define SPRITES_H
 
+#include <Arduino.h>
+
 // this file contains the bitmap array for all our
 // game sprites
 
