@@ -56,6 +56,11 @@ class Game {
 
     static void updateGameState() {
       gameInstance->state.decay();
+
+      // Check if pet just died and show death animation
+      if (!gameInstance->state.isAlive()) {
+        gameInstance->renderPtr->playDeathAnimation();
+      }
     }
 
     static void updateDirection() {
@@ -77,9 +82,8 @@ class Game {
     }
 
     static void updateDisplay() {
-      // Check if dead
+      // Don't render normal display if dead
       if (!gameInstance->state.isAlive()) {
-        gameInstance->renderPtr->playDeathAnimation();
         return;
       }
 

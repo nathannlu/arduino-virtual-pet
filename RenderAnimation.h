@@ -66,8 +66,10 @@ class RenderAnimation {
       const int appleHeight = 2;  // Height above pet's head to show apple
       const int jumpHeight = 6;    // How high the pet jumps
 
-      // Show centered text
-      textBox->writeCentered(disp, "Yum!", 1);
+      // Random feed text
+      const char* feedTexts[] = {"INFINITE APPLE", "munch!", "nommers"};
+      const char* selectedText = feedTexts[random(0, 3)];
+      textBox->writeCentered(disp, selectedText, 1);
 
       // Step 1: Show apple floating above pet
       renderPet(ANIM_IDLE, x, y, direction);
@@ -112,8 +114,8 @@ class RenderAnimation {
       const int arrowHeight = 7;
       const int petWidth = SPRITE_WIDTH;
 
-      // Show centered text
-      textBox->writeCentered(disp, "Wheee!", 1);
+      // Show play text
+      textBox->writeCentered(disp, "ouch", 1);
 
       // Pet faces right, arrow comes from right
       int arrowStartX = 84;
@@ -158,8 +160,10 @@ class RenderAnimation {
       int currentDirection = direction;
       int currentX = x;
 
-      // Show centered text
-      textBox->writeCentered(disp, "Party!", 1);
+      // Random rave text
+      const char* raveTexts[] = {"Yay rave", "I love molly!", "Zedd is so good"};
+      const char* selectedText = raveTexts[random(0, 4)];
+      textBox->writeCentered(disp, selectedText, 1);
 
       // Rave for 5 seconds
       while (millis() - startTime < 5000) {
@@ -223,7 +227,7 @@ class RenderAnimation {
       disp->drawBitmap(deathX + bottom->getX(), deathY + bottom->getY(), epd_bitmap_death, 41, 24, BLACK);
 
       // Show death text
-      textBox->writeCentered(disp, "Why did you let me die Sharon", 1);
+      textBox->writeCentered(disp, "im ded", 1);
 
       paint();
     }
