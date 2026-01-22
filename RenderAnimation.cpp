@@ -44,7 +44,7 @@ void RenderAnimation::paint() {
 void RenderAnimation::playFeedAnimation(int x, int y, int direction) {
   Adafruit_PCD8544* disp = displayPtr->getDisplay();
   Partition* textBox = displayPtr->getTextBoxPartition();
-  const int appleHeight = 2;  // Height above pet's head to show apple
+  const int appleHeight = 0;  // Height above pet's head to show apple
   const int jumpHeight = 6;    // How high the pet jumps
 
   // Random feed text
@@ -142,7 +142,7 @@ void RenderAnimation::playRaveAnimation(int x, int y, int direction) {
   int currentX = x;
 
   // Random rave text
-  const char* raveTexts[] = {"Yay rave", "I love molly!", "Zedd is so good"};
+  const char* raveTexts[] = {"Yay rave", "I love molly!", "yummy drugz"};
   const char* selectedText = raveTexts[random(0, 3)];
   textBox->writeCentered(disp, selectedText, 1);
 
