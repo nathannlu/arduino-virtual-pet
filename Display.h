@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <Adafruit_PCD8544.h>
+#include "Sprites.h"
 
 // this file describes our arduino display
 
@@ -41,6 +42,21 @@ class Partition {
       display->setTextColor(BLACK);
       display->setCursor(x, y);
       display->println(text);
+    }
+
+    void writeCentered(Adafruit_PCD8544* display, const char* text, int textSize = 1) {
+      // Clear this partition first
+      clear(display);
+
+      // Calculate text width (rough estimate: 6 pixels per char for size 1)
+      int textWidth = strlen(text) * 6 * textSize;
+      int textX = x + (width - textWidth) / 2;
+
+      // Write centered text to this partition
+      display->setTextSize(textSize);
+      display->setTextColor(BLACK);
+      display->setCursor(textX, y);
+      display->print(text);
     }
 
     void drawBitmap(
@@ -125,6 +141,7 @@ class Display {
     // Partition access
     Partition* getTopPartition() { return &topPartition; }
     Partition* getBottomPartition() { return &bottomPartition; }
+    Partition* getTextBoxPartition() { return &textBoxPartition; }
 
     // Paint all partitions to the display
     void paint();
@@ -133,11 +150,15 @@ class Display {
 
   private:
     Adafruit_PCD8544* display;
-    static const int TOP_HEIGHT = 10;    // Top section: 0-9 pixels
-    static const int BOTTOM_Y = 10;      // Bottom section starts at pixel 10
+    static const int TOP_HEIGHT = 10;      // Top section: 0-9 pixels
+    static const int PET_Y = 10;           // Pet section starts at pixel 10
+    static const int PET_HEIGHT = 30;      // Pet section: 10-39 pixels
+    static const int TEXTBOX_Y = 40;       // Text box starts at pixel 40
+    static const int TEXTBOX_HEIGHT = 8;   // Text box: 40-47 pixels (8px tall)
 
     Partition topPartition{0, 0, 84, TOP_HEIGHT};
-    Partition bottomPartition{0, BOTTOM_Y, 84, 48 - BOTTOM_Y};
+    Partition bottomPartition{0, PET_Y, 84, PET_HEIGHT};
+    Partition textBoxPartition{0, TEXTBOX_Y, 84, TEXTBOX_HEIGHT};
 };
 
 #endif

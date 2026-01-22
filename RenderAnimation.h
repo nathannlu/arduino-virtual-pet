@@ -62,8 +62,12 @@ class RenderAnimation {
 
     void playFeedAnimation(int x, int y, int direction) {
       Adafruit_PCD8544* disp = displayPtr->getDisplay();
-      const int appleHeight = 4;  // Height above pet's head to show apple
-      const int jumpHeight = 8;    // How high the pet jumps
+      Partition* textBox = displayPtr->getTextBoxPartition();
+      const int appleHeight = 2;  // Height above pet's head to show apple
+      const int jumpHeight = 6;    // How high the pet jumps
+
+      // Show centered text
+      textBox->writeCentered(disp, "Yum!", 1);
 
       // Step 1: Show apple floating above pet
       renderPet(ANIM_IDLE, x, y, direction);
@@ -94,14 +98,22 @@ class RenderAnimation {
       // Step 5: Back to idle on ground
       renderPet(ANIM_IDLE, x, y, direction);
       paint();
+
+      // Clear text after animation
+      textBox->clear(disp);
+      paint();
     }
 
     void playPlayAnimation(int x, int y, int direction) {
       Adafruit_PCD8544* disp = displayPtr->getDisplay();
       Partition* bottom = displayPtr->getBottomPartition();
+      Partition* textBox = displayPtr->getTextBoxPartition();
       const int arrowWidth = 22;
       const int arrowHeight = 7;
-      const int petWidth = 19;
+      const int petWidth = SPRITE_WIDTH;
+
+      // Show centered text
+      textBox->writeCentered(disp, "Wheee!", 1);
 
       // Pet faces right, arrow comes from right
       int arrowStartX = 84;
@@ -131,14 +143,23 @@ class RenderAnimation {
       // Return to idle with original direction
       renderPet(ANIM_IDLE, x, y, direction);
       paint();
+
+      // Clear text after animation
+      textBox->clear(disp);
+      paint();
     }
 
     void playRaveAnimation(int x, int y, int direction) {
+      Adafruit_PCD8544* disp = displayPtr->getDisplay();
+      Partition* textBox = displayPtr->getTextBoxPartition();
       unsigned long startTime = millis();
       const int jumpHeight = 6;
       const int moveDistance = 4;  // How far to move horizontally per jump
       int currentDirection = direction;
       int currentX = x;
+
+      // Show centered text
+      textBox->writeCentered(disp, "Party!", 1);
 
       // Rave for 5 seconds
       while (millis() - startTime < 5000) {
@@ -180,10 +201,30 @@ class RenderAnimation {
       // Return to idle
       renderPet(ANIM_IDLE, currentX, y, currentDirection);
       paint();
+
+      // Clear text after animation
+      textBox->clear(disp);
+      paint();
     }
 
-    void playDeathAnimation(int x, int y, int direction) {
-      renderPet(ANIM_DEATH, x, y, direction);
+    void playDeathAnimation() {
+      Adafruit_PCD8544* disp = displayPtr->getDisplay();
+      Partition* bottom = displayPtr->getBottomPartition();
+      Partition* textBox = displayPtr->getTextBoxPartition();
+
+      // Clear bottom partition
+      bottom->clear(disp);
+
+      // Death sprite is 41x24px, center it in the partition
+      int deathX = (84 - 41) / 2;  // Center horizontally in 84px wide partition
+      int deathY = (30 - 24) / 2;  // Center vertically in 30px tall partition
+
+      // Draw death sprite centered (no flip)
+      disp->drawBitmap(deathX + bottom->getX(), deathY + bottom->getY(), epd_bitmap_death, 41, 24, BLACK);
+
+      // Show death text
+      textBox->writeCentered(disp, "Why did you let me die Sharon", 1);
+
       paint();
     }
 
@@ -201,7 +242,7 @@ class RenderAnimation {
         case ANIM_RAVE:
           return epd_bitmap_rave;
         case ANIM_DEATH:
-          return epd_bitmap_idle;  // TODO: Add death sprite
+          return epd_bitmap_death;
         default:
           return epd_bitmap_idle;
       }

@@ -1,8 +1,9 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
+#include "Sprites.h"
 
-// everything related to the game state 
+// everything related to the game state
 // goes here
 
 
@@ -14,7 +15,7 @@ class GameState {
       rave = 100;
       alive = true;
       x = 0;
-      y = 18;  // Near bottom of 38px tall partition (38 - 20 sprite height)
+      y = 30 - SPRITE_HEIGHT;  // Bottom of pet partition (30px tall - 20px sprite)
       direction = 1;  // Start facing right
     }
 

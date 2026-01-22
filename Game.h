@@ -59,18 +59,30 @@ class Game {
     }
 
     static void updateDirection() {
+      // Don't change direction if dead
+      if (!gameInstance->state.isAlive()) return;
+
       // Randomly flip direction: 0 = left, 1 = right
       int newDirection = random(0, 2);
       gameInstance->state.setDirection(newDirection);
     }
 
     static void updateWalk() {
+      // Don't walk if dead
+      if (!gameInstance->state.isAlive()) return;
+
       // Walk within the bottom partition bounds
       // Bottom partition is 84 pixels wide, sprite is 19 pixels wide
       gameInstance->state.walk(0, 84, 19);
     }
 
     static void updateDisplay() {
+      // Check if dead
+      if (!gameInstance->state.isAlive()) {
+        gameInstance->renderPtr->playDeathAnimation();
+        return;
+      }
+
       // Render stats
       gameInstance->renderPtr->renderStats(
         gameInstance->state.getHunger(),
