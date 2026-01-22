@@ -4,7 +4,7 @@
 #include "EventScheduler.h"
 #include "Display.h"
 #include "GameState.h"
-#include "GameState.h"
+#include "Render.h"
 
 class Game {
 
@@ -70,17 +70,30 @@ class Game {
     }
 
     static void updateDisplay() {
-      // Update top partition with stats
-      char statsBuffer[50];
-      sprintf(statsBuffer, "H:%d P:%d R:%d",
-        gameInstance->state.getHunger(),
-        gameInstance->state.getPlay(),
-        gameInstance->state.getRave()
-      );
-      gameInstance->displayPtr->getTopPartition()->write(
-        gameInstance->displayPtr->getDisplay(),
-        statsBuffer
-      );
+      // Update top partition with stats using icons
+      Adafruit_PCD8544* disp = gameInstance->displayPtr->getDisplay();
+      Partition* top = gameInstance->displayPtr->getTopPartition();
+
+      // Clear top partition
+      top->clear(disp);
+
+      // Draw apple icon + hunger value
+      disp->drawBitmap(0, 0, epd_bitmap_apple, 5, 6, BLACK);
+      disp->setCursor(7, 0);
+      disp->setTextSize(1);
+      disp->setTextColor(BLACK);
+      disp->print(gameInstance->state.getHunger());
+
+      // Draw smiley icon + play value
+      disp->drawBitmap(28, 0, epd_bitmap_smiley, 5, 4, BLACK);
+      disp->setCursor(35, 0);
+      disp->print(gameInstance->state.getPlay());
+
+      // Draw heart icon + rave value
+      disp->drawBitmap(56, 0, epd_bitmap_heart, 5, 4, BLACK);
+      disp->setCursor(63, 0);
+      disp->print(gameInstance->state.getRave());
+
       gameInstance->displayPtr->paint();
     }
 

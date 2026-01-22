@@ -43,6 +43,16 @@ class Partition {
       display->println(text);
     }
 
+    void drawBitmap(Adafruit_PCD8544* display, const unsigned char* bitmap, int bitmapWidth, int bitmapHeight) {
+      // Clear this partition first
+      clear(display);
+
+      // Draw bitmap centered in the partition
+      int bitmapX = x + (width - bitmapWidth) / 2;
+      int bitmapY = y + (height - bitmapHeight) / 2;
+      display->drawBitmap(bitmapX, bitmapY, bitmap, bitmapWidth, bitmapHeight, BLACK);
+    }
+
     int getX() const { return x; }
     int getY() const { return y; }
     int getWidth() const { return width; }
