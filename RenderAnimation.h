@@ -5,6 +5,10 @@
 #include "Sprites.h"
 #include "GameState.h"
 
+
+// this file contains all the code describing the
+// sprite animations
+
 enum AnimationType {
   ANIM_IDLE,
   ANIM_EAT,
@@ -57,9 +61,37 @@ class RenderAnimation {
     }
 
     void playFeedAnimation(int x, int y, int direction) {
-      renderPet(ANIM_EAT, x, y, direction);
+      Adafruit_PCD8544* disp = displayPtr->getDisplay();
+      const int appleHeight = 4;  // Height above pet's head to show apple
+      const int jumpHeight = 8;    // How high the pet jumps
+
+      // Step 1: Show apple floating above pet
+      renderPet(ANIM_IDLE, x, y, direction);
+      disp->drawBitmap(x + 7, y - appleHeight, epd_bitmap_apple, 5, 6, BLACK);
       paint();
-      delay(1000);
+      delay(200);
+
+      // Step 2: Pet jumps up (idle animation while jumping)
+      for (int i = 0; i <= jumpHeight; i += 2) {
+        renderPet(ANIM_IDLE, x, y - i, direction);
+        disp->drawBitmap(x + 7, y - appleHeight, epd_bitmap_apple, 5, 6, BLACK);
+        paint();
+        delay(50);
+      }
+
+      // Step 3: At peak of jump, eat the apple
+      renderPet(ANIM_EAT, x, y - jumpHeight, direction);
+      paint();
+      delay(300);
+
+      // Step 4: Fall back down (idle animation while falling)
+      for (int i = jumpHeight; i >= 0; i -= 2) {
+        renderPet(ANIM_IDLE, x, y - i, direction);
+        paint();
+        delay(50);
+      }
+
+      // Step 5: Back to idle on ground
       renderPet(ANIM_IDLE, x, y, direction);
       paint();
     }
@@ -73,10 +105,51 @@ class RenderAnimation {
     }
 
     void playRaveAnimation(int x, int y, int direction) {
-      renderPet(ANIM_RAVE, x, y, direction);
-      paint();
-      delay(1000);
-      renderPet(ANIM_IDLE, x, y, direction);
+      unsigned long startTime = millis();
+      const int jumpHeight = 6;
+      const int moveDistance = 4;  // How far to move horizontally per jump
+      int currentDirection = direction;
+      int currentX = x;
+
+      // Rave for 5 seconds
+      while (millis() - startTime < 5000) {
+        // Jump up and move forward
+        for (int i = 0; i <= jumpHeight; i += 2) {
+          renderPet(ANIM_RAVE, currentX, y - i, currentDirection);
+          paint();
+          delay(20);  // Faster jumping
+        }
+
+        // Move forward in current direction
+        if (currentDirection == 1) {  // Moving right
+          currentX += moveDistance;
+          if (currentX + 19 >= 84) {  // Hit right wall
+            currentX = 84 - 19;
+            currentDirection = 0;  // Turn left
+          }
+        } else {  // Moving left
+          currentX -= moveDistance;
+          if (currentX <= 0) {  // Hit left wall
+            currentX = 0;
+            currentDirection = 1;  // Turn right
+          }
+        }
+
+        // Fall down
+        for (int i = jumpHeight; i >= 0; i -= 2) {
+          renderPet(ANIM_RAVE, currentX, y - i, currentDirection);
+          paint();
+          delay(20);  // Faster jumping
+        }
+
+        // Randomly change direction after landing (50% chance)
+        if (random(0, 2) == 1) {
+          currentDirection = 1 - currentDirection;  // Flip direction
+        }
+      }
+
+      // Return to idle
+      renderPet(ANIM_IDLE, currentX, y, currentDirection);
       paint();
     }
 

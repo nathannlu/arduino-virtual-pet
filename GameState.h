@@ -14,7 +14,7 @@ class GameState {
       rave = 100;
       alive = true;
       x = 0;
-      y = 0;
+      y = 18;  // Near bottom of 38px tall partition (38 - 20 sprite height)
       direction = 1;  // Start facing right
     }
 

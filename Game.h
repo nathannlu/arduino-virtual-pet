@@ -17,10 +17,10 @@ class Game {
     }
 
     void setup() {
-      eventScheduler->addEvent(updateGameState, 2000);  // Update every 2 seconds
+      eventScheduler->addEvent(updateGameState, 10000);  // Update every 2 seconds
       eventScheduler->addEvent(updateDisplay, 500);     // Refresh display every 0.5 seconds
       eventScheduler->addRandomEvent(updateDirection, 2000, 10000);  // Update direction randomly every 2-10 seconds
-      eventScheduler->addEvent(updateWalk, 100);  // Walk every 100ms
+      eventScheduler->addEvent(updateWalk, 200);
 
       // Initialize with idle state
       renderPtr->renderPet(ANIM_IDLE, state.getX(), state.getY(), state.getDirection());

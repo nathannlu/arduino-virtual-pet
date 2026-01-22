@@ -128,8 +128,8 @@ class Display {
 
   private:
     Adafruit_PCD8544* display;
-    static const int TOP_HEIGHT = 24;    // Top section: 0-23 pixels
-    static const int BOTTOM_Y = 24;      // Bottom section starts at pixel 24
+    static const int TOP_HEIGHT = 10;    // Top section: 0-9 pixels
+    static const int BOTTOM_Y = 10;      // Bottom section starts at pixel 10
 
     Partition topPartition{0, 0, 84, TOP_HEIGHT};
     Partition bottomPartition{0, BOTTOM_Y, 84, 48 - BOTTOM_Y};
