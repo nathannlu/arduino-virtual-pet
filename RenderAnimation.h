@@ -97,9 +97,38 @@ class RenderAnimation {
     }
 
     void playPlayAnimation(int x, int y, int direction) {
-      renderPet(ANIM_PLAY, x, y, direction);
+      Adafruit_PCD8544* disp = displayPtr->getDisplay();
+      Partition* bottom = displayPtr->getBottomPartition();
+      const int arrowWidth = 22;
+      const int arrowHeight = 7;
+      const int petWidth = 19;
+
+      // Pet faces right, arrow comes from right
+      int arrowStartX = 84;
+      int arrowEndX = x + petWidth;  // Arrow stops when it hits the right edge of pet
+      int arrowY = y + 6;  // Arrow at pet's middle height
+
+      // Arrow flies in from right to left
+      for (int arrowX = arrowStartX; arrowX >= arrowEndX; arrowX -= 4) {
+        // Clear bottom partition
+        bottom->clear(disp);
+
+        // Draw pet facing right (direction = 1, no flip)
+        disp->drawBitmap(x + bottom->getX(), y + bottom->getY(), epd_bitmap_idle, 19, 20, BLACK);
+
+        // Draw arrow
+        disp->drawBitmap(arrowX + bottom->getX(), arrowY + bottom->getY(), epd_bitmap_arrow, arrowWidth, arrowHeight, BLACK);
+
+        paint();
+        delay(30);
+      }
+
+      // Arrow hits! Play animation (facing right)
+      renderPet(ANIM_PLAY, x, y, 1);
       paint();
-      delay(1000);
+      delay(800);
+
+      // Return to idle with original direction
       renderPet(ANIM_IDLE, x, y, direction);
       paint();
     }
