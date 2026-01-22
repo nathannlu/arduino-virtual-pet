@@ -1,4 +1,5 @@
 #include "Display.h"
+#include "RenderAnimation.h"
 #include "Game.h"
 
 #define BUTTON_FEED 10
@@ -6,10 +7,11 @@
 #define BUTTON_RAVE 12
 
 Display display;
+RenderAnimation renderer(&display);
 EventScheduler scheduler;
 Game game(
   &scheduler,
-  &display
+  &renderer
 );
 
 void setup() {

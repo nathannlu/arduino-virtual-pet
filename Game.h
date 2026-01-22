@@ -2,18 +2,17 @@
 #define GAME_H
 
 #include "EventScheduler.h"
-#include "Display.h"
+#include "RenderAnimation.h"
 #include "GameState.h"
-#include "Sprites.h"
 
 class Game {
 
   public:
     GameState state;
 
-    Game(EventScheduler* scheduler, Display* disp) {
+    Game(EventScheduler* scheduler, RenderAnimation* renderer) {
       eventScheduler = scheduler;
-      displayPtr = disp;
+      renderPtr = renderer;
       gameInstance = this;
     }
 
@@ -21,18 +20,11 @@ class Game {
       eventScheduler->addEvent(updateGameState, 2000);  // Update every 2 seconds
       eventScheduler->addEvent(updateDisplay, 500);     // Refresh display every 0.5 seconds
       eventScheduler->addRandomEvent(updateDirection, 2000, 10000);  // Update direction randomly every 2-10 seconds
+      eventScheduler->addEvent(updateWalk, 100);  // Walk every 100ms
 
-      // Initialize with idle state on bottom partition
-      displayPtr->getBottomPartition()->drawBitmap(
-        displayPtr->getDisplay(),
-        epd_bitmap_idle,
-        19,
-        20,
-        state.getX(),
-        state.getY(),
-        state.getDirection() == 0  // flip if facing left (direction == 0)
-      );
-      displayPtr->paint();
+      // Initialize with idle state
+      renderPtr->renderPet(ANIM_IDLE, state.getX(), state.getY(), state.getDirection());
+      renderPtr->paint();
     }
 
     void loop() {
@@ -40,96 +32,24 @@ class Game {
     }
 
     void doFeed() {
-
-      // render eating sprite
-      displayPtr->getBottomPartition()->drawBitmap(
-        displayPtr->getDisplay(),
-        epd_bitmap_eat,
-        19,
-        20,
-        state.getX(),
-        state.getY(),
-        state.getDirection() == 0
-      );
-      displayPtr->paint();
-
       state.feed();
-      delay(1000);
-
-
-      // go back to idle
-      displayPtr->getBottomPartition()->drawBitmap(
-        displayPtr->getDisplay(),
-        epd_bitmap_idle,
-        19,
-        20,
-        state.getX(),
-        state.getY(),
-        state.getDirection() == 0
-      );
-      displayPtr->paint();
+      renderPtr->playFeedAnimation(state.getX(), state.getY(), state.getDirection());
     }
 
     void doPlay() {
-      // render play
-      displayPtr->getBottomPartition()->drawBitmap(
-        displayPtr->getDisplay(),
-        epd_bitmap_fun,
-        19,
-        20,
-        state.getX(),
-        state.getY(),
-        state.getDirection() == 0
-      );
-
-      displayPtr->paint();
       state.doPlay();
-      delay(1000);
-
-      // go back to idle
-      displayPtr->getBottomPartition()->drawBitmap(
-        displayPtr->getDisplay(),
-        epd_bitmap_idle,
-        19,
-        20,
-        state.getX(),
-        state.getY(),
-        state.getDirection() == 0
-      );
-      displayPtr->paint();
+      renderPtr->playPlayAnimation(state.getX(), state.getY(), state.getDirection());
     }
 
     void doRave() {
-      displayPtr->getBottomPartition()->drawBitmap(
-        displayPtr->getDisplay(),
-        epd_bitmap_rave,
-        19,
-        20,
-        state.getX(),
-        state.getY(),
-        state.getDirection() == 0
-      );
-      displayPtr->paint();
       state.doRave();
-      delay(1000);
-
-      // go back to idle
-      displayPtr->getBottomPartition()->drawBitmap(
-        displayPtr->getDisplay(),
-        epd_bitmap_idle,
-        19,
-        20,
-        state.getX(),
-        state.getY(),
-        state.getDirection() == 0
-      );
-      displayPtr->paint();
+      renderPtr->playRaveAnimation(state.getX(), state.getY(), state.getDirection());
     }
 
 
   private:
     EventScheduler* eventScheduler;
-    Display* displayPtr;
+    RenderAnimation* renderPtr;
 
     static Game* gameInstance;
 
@@ -144,32 +64,29 @@ class Game {
       gameInstance->state.setDirection(newDirection);
     }
 
+    static void updateWalk() {
+      // Walk within the bottom partition bounds
+      // Bottom partition is 84 pixels wide, sprite is 19 pixels wide
+      gameInstance->state.walk(0, 84, 19);
+    }
+
     static void updateDisplay() {
-      // Update top partition with stats using icons
-      Adafruit_PCD8544* disp = gameInstance->displayPtr->getDisplay();
-      Partition* top = gameInstance->displayPtr->getTopPartition();
+      // Render stats
+      gameInstance->renderPtr->renderStats(
+        gameInstance->state.getHunger(),
+        gameInstance->state.getPlay(),
+        gameInstance->state.getRave()
+      );
 
-      // Clear top partition
-      top->clear(disp);
+      // Render pet
+      gameInstance->renderPtr->renderPet(
+        ANIM_IDLE,
+        gameInstance->state.getX(),
+        gameInstance->state.getY(),
+        gameInstance->state.getDirection()
+      );
 
-      // Draw apple icon + hunger value
-      disp->drawBitmap(0, 0, epd_bitmap_apple, 5, 6, BLACK);
-      disp->setCursor(7, 0);
-      disp->setTextSize(1);
-      disp->setTextColor(BLACK);
-      disp->print(gameInstance->state.getHunger());
-
-      // Draw smiley icon + play value
-      disp->drawBitmap(28, 0, epd_bitmap_smiley, 5, 4, BLACK);
-      disp->setCursor(35, 0);
-      disp->print(gameInstance->state.getPlay());
-
-      // Draw heart icon + rave value
-      disp->drawBitmap(56, 0, epd_bitmap_heart, 5, 4, BLACK);
-      disp->setCursor(63, 0);
-      disp->print(gameInstance->state.getRave());
-
-      gameInstance->displayPtr->paint();
+      gameInstance->renderPtr->paint();
     }
 
 };

@@ -92,6 +92,27 @@ class GameState {
       direction = newDirection;
     }
 
+    void walk(int minX, int maxX, int spriteWidth) {
+      if (!alive) return;
+
+      // Move in the current direction
+      if (direction == 1) {  // Moving right
+        x += 1;
+        // Check if hit right wall
+        if (x + spriteWidth >= maxX) {
+          x = maxX - spriteWidth;
+          direction = 0;  // Change to left
+        }
+      } else {  // Moving left (direction == 0)
+        x -= 1;
+        // Check if hit left wall
+        if (x <= minX) {
+          x = minX;
+          direction = 1;  // Change to right
+        }
+      }
+    }
+
   private:
     int hunger;
     int play;
