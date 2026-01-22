@@ -43,14 +43,27 @@ class Partition {
       display->println(text);
     }
 
-    void drawBitmap(Adafruit_PCD8544* display, const unsigned char* bitmap, int bitmapWidth, int bitmapHeight) {
+    void drawBitmap(Adafruit_PCD8544* display, const unsigned char* bitmap, int bitmapWidth, int bitmapHeight, int offsetX = -1, int offsetY = -1, bool flip = false) {
       // Clear this partition first
       clear(display);
 
-      // Draw bitmap centered in the partition
-      int bitmapX = x + (width - bitmapWidth) / 2;
-      int bitmapY = y + (height - bitmapHeight) / 2;
-      display->drawBitmap(bitmapX, bitmapY, bitmap, bitmapWidth, bitmapHeight, BLACK);
+      int bitmapX, bitmapY;
+
+      // If offsets are provided (not -1), use them; otherwise center the bitmap
+      if (offsetX == -1 || offsetY == -1) {
+        bitmapX = x + (width - bitmapWidth) / 2;
+        bitmapY = y + (height - bitmapHeight) / 2;
+      } else {
+        bitmapX = x + offsetX;
+        bitmapY = y + offsetY;
+      }
+
+      if (flip) {
+        // Draw flipped bitmap pixel by pixel
+        drawFlippedBitmap(display, bitmap, bitmapX, bitmapY, bitmapWidth, bitmapHeight);
+      } else {
+        display->drawBitmap(bitmapX, bitmapY, bitmap, bitmapWidth, bitmapHeight, BLACK);
+      }
     }
 
     int getX() const { return x; }
@@ -60,6 +73,25 @@ class Partition {
 
   private:
     int x, y, width, height;
+
+    void drawFlippedBitmap(Adafruit_PCD8544* display, const unsigned char* bitmap, int bitmapX, int bitmapY, int w, int h) {
+      // Draw bitmap flipped horizontally
+      for (int j = 0; j < h; j++) {
+        for (int i = 0; i < w; i++) {
+          // Calculate byte and bit position in the original bitmap
+          int byteIndex = (j * w + i) / 8;
+          int bitIndex = 7 - ((j * w + i) % 8);
+
+          // Read the pixel from the bitmap
+          bool pixel = (bitmap[byteIndex] >> bitIndex) & 1;
+
+          // Draw the pixel flipped horizontally
+          if (pixel) {
+            display->drawPixel(bitmapX + (w - 1 - i), bitmapY + j, BLACK);
+          }
+        }
+      }
+    }
 };
 
 

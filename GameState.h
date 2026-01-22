@@ -13,6 +13,9 @@ class GameState {
       play = 100;
       rave = 100;
       alive = true;
+      x = 0;
+      y = 0;
+      direction = 1;  // Start facing right
     }
 
     void feed() {
@@ -65,11 +68,39 @@ class GameState {
       return rave;
     }
 
+    int getX() const {
+      return x;
+    }
+
+    int getY() const {
+      return y;
+    }
+
+    void setX(int newX) {
+      x = newX;
+    }
+
+    void setY(int newY) {
+      y = newY;
+    }
+
+    int getDirection() const {
+      return direction;
+    }
+
+    void setDirection(int newDirection) {
+      direction = newDirection;
+    }
+
   private:
     int hunger;
     int play;
     int rave;
     bool alive;
+
+    int x;
+    int y;
+    int direction;  // 0 = left, 1 = right
 
     void checkAlive() {
       // Pet dies if any stat reaches 0

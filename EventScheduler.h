@@ -6,11 +6,31 @@
 // our callbacks are void functions
 using CallbackFunction = void(*)();
 
+enum EventType {
+  FIXED_INTERVAL,
+  RANDOM_INTERVAL
+};
+
+struct FixedIntervalEvent {
+  unsigned long interval;
+};
+
+struct RandomIntervalEvent {
+  unsigned long minInterval;
+  unsigned long maxInterval;
+  unsigned long currentInterval;
+};
+
 // a callback event's state
 struct Event {
+  EventType type;
   CallbackFunction callback;
-  unsigned long interval;
   unsigned long lastRun;
+
+  union {
+    FixedIntervalEvent fixed;
+    RandomIntervalEvent random;
+  };
 };
 
 // handle running events every
@@ -28,6 +48,12 @@ class EventScheduler {
     void addEvent(
       CallbackFunction cb,
       unsigned long intervalMs
+    );
+
+    void addRandomEvent(
+      CallbackFunction cb,
+      unsigned long minIntervalMs,
+      unsigned long maxIntervalMs
     );
 
     void update();
