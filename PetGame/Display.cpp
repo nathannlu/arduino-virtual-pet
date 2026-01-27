@@ -10,7 +10,6 @@
 #define DC  5
 #define CE  6
 #define RST 7
-#define BACKLIGHT 9
 
 // Partition implementation
 Partition::Partition(int x, int y, int width, int height)
@@ -119,9 +118,6 @@ Display::Display() {
 
 void Display::setup() {
   Serial.begin(9600);
-
-  // Setup backlight
-  pinMode(BACKLIGHT, OUTPUT);
 
   display->begin();
   display->setContrast(65);
