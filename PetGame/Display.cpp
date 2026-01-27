@@ -5,11 +5,11 @@
 
 // these hardcoded constants
 // correspond to the arduino pins
-#define CLK 7
-#define DIN 6
+#define CLK 3
+#define DIN 4
 #define DC  5
-#define CE  4
-#define RST 3
+#define CE  6
+#define RST 7
 #define BACKLIGHT 9
 
 // Partition implementation
