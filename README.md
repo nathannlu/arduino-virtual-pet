@@ -14,8 +14,8 @@ This repository contains code, 3d printing files, and game assets used in the pr
 https://github.com/user-attachments/assets/822a2750-46d9-452c-813a-99ff8e9d6c07
 
 ## Resources
-- <a href="https://github.com/nathannlu/arduino-pet/tree/main/stl">3d printing files</a>
-- <a href="https://github.com/nathannlu/arduino-pet/tree/main/sprites">Game assets</a>
+- <a href="https://github.com/nathannlu/arduino-virtual-pet/tree/main/stl">3d printing files</a>
+- <a href="https://github.com/nathannlu/arduino-virtual-pet/tree/main/sprites">Game assets</a>
 
 Note:
 You can use https://javl.github.io/image2cpp/ to convert the .svg in
